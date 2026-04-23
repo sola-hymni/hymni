@@ -123,7 +123,7 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script>
         const CSV_URL = "https://docs.google.com/spreadsheets/d/1XJ-MzLjds3Pe_YXOqnEgQQnPwpcvIORgnz9jSlwwaj4/gviz/tq?tqx=out:csv";
         const audio = document.getElementById('intro');
@@ -161,9 +161,9 @@
                 return;
             }
 
-            listaDiv.innerHTML = ''; // Limpiamos
+            listaDiv.innerHTML = '';
             
-            publicables.forEach((h, index) => {
+            publicables.forEach((h) => {
                 const titulo = h.Titulo_Himno || h.Titulo || "Sin título";
                 const fecha = h.Fecha_Publicacion || "";
                 const fuente = h.Fuente_Himnario || "";
@@ -172,7 +172,6 @@
 
                 const item = document.createElement('div');
                 item.className = 'himno-item';
-                // Usamos una función anónima para evitar problemas de comillas en el HTML
                 item.onclick = () => prepararModal(h);
                 
                 item.innerHTML = `
@@ -183,20 +182,31 @@
             });
         }
 
- // 3. FUNCIÓN INTERMEDIA PARA SEGURIDAD (CORREGIDA)
+        // 3. FUNCIÓN INTERMEDIA PARA SEGURIDAD
         function prepararModal(h) {
-            // Buscamos el título en varias opciones de nombre
             const titulo = h.Titulo_Himno || h.Titulo || h.titulo || "Sin título";
             const meta = `${h.Fecha_Publicacion || ''} | ${h.Fuente_Himnario || ''} #${h.Numero_Himnario || ''}`;
-            
-            // BUSCAMOS LA LETRA (Probamos todas las variaciones posibles de tu Excel)
             const letra = h.Letra_Himno || h.Letra || h.letra || h.CONTENIDO || "";
-            
             const autor = h.Compositor || h.Autor || h.autor || "Anónimo";
             const anio = h.Anio_Composicion || h.Anio || h.año || "";
             const biblico = h.Texto_Biblico || h.Texto || h.Referencia || "";
 
             abrirModal(titulo, meta, letra, autor, anio, biblico);
+        }
+
+        function iniciarApp() {
+            audio.play().catch(e => console.log("Audio error:", e));
+            document.getElementById('splash').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('splash').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                audioBtn.style.display = 'block';
+            }, 800);
+        }
+
+        function toggleAudio() {
+            if (audio.paused) { audio.play(); audioBtn.innerText = "PAUSAR MÚSICA"; }
+            else { audio.pause(); audioBtn.innerText = "REPRODUCIR"; }
         }
 
         function abrirModal(titulo, meta, letra, compositor, anio, biblico) {
@@ -211,16 +221,13 @@
                 bibDiv.style.display = 'block';
             } else { bibDiv.style.display = 'none'; }
 
-            // PROCESAR LETRA: Si no hay letra, avisamos
             if (!letra || letra === "") {
                 document.getElementById('modal-letra').innerHTML = "<p style='opacity:0.5; text-align:center;'>Letra en proceso de carga...</p>";
             } else {
-                // Procesar énfasis [texto] y saltos de línea
                 let letraLimpia = letra.replace(/\[(.*?)\]/g, '<span class="letra-enfasis">$1</span>');
                 document.getElementById('modal-letra').innerHTML = letraLimpia;
             }
             
-            // Ajustamos fondo para que sea un pelín más transparente y se vea el logo/fondo
             const modal = document.getElementById('modal-himno');
             modal.style.backgroundColor = "rgba(22, 40, 68, 0.94)";
             modal.style.display = 'block';
