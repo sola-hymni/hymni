@@ -183,31 +183,20 @@
             });
         }
 
-        // 3. NUEVA FUNCIÓN INTERMEDIA PARA SEGURIDAD
+ // 3. FUNCIÓN INTERMEDIA PARA SEGURIDAD (CORREGIDA)
         function prepararModal(h) {
-            const titulo = h.Titulo_Himno || h.Titulo || "Sin título";
+            // Buscamos el título en varias opciones de nombre
+            const titulo = h.Titulo_Himno || h.Titulo || h.titulo || "Sin título";
             const meta = `${h.Fecha_Publicacion || ''} | ${h.Fuente_Himnario || ''} #${h.Numero_Himnario || ''}`;
-            const letra = h.Letra_Himno || h.Letra || "";
-            const autor = h.Compositor || h.Autor || "Anónimo";
-            const anio = h.Anio_Composicion || h.Anio || "";
-            const biblico = h.Texto_Biblico || h.Texto || "";
+            
+            // BUSCAMOS LA LETRA (Probamos todas las variaciones posibles de tu Excel)
+            const letra = h.Letra_Himno || h.Letra || h.letra || h.CONTENIDO || "";
+            
+            const autor = h.Compositor || h.Autor || h.autor || "Anónimo";
+            const anio = h.Anio_Composicion || h.Anio || h.año || "";
+            const biblico = h.Texto_Biblico || h.Texto || h.Referencia || "";
 
             abrirModal(titulo, meta, letra, autor, anio, biblico);
-        }
-
-        function iniciarApp() {
-            audio.play().catch(e => console.log("Audio error:", e));
-            document.getElementById('splash').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('splash').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
-                audioBtn.style.display = 'block';
-            }, 800);
-        }
-
-        function toggleAudio() {
-            if (audio.paused) { audio.play(); audioBtn.innerText = "PAUSAR MÚSICA"; }
-            else { audio.pause(); audioBtn.innerText = "REPRODUCIR"; }
         }
 
         function abrirModal(titulo, meta, letra, compositor, anio, biblico) {
@@ -217,16 +206,24 @@
             document.getElementById('modal-autoria').innerText = `${compositor} (${anio})`;
             
             const bibDiv = document.getElementById('seccion-biblica');
-            if (biblico && biblico !== 'undefined') {
+            if (biblico && biblico !== 'undefined' && biblico !== '') {
                 document.getElementById('modal-biblico').innerText = biblico;
                 bibDiv.style.display = 'block';
             } else { bibDiv.style.display = 'none'; }
 
-            // Procesar énfasis [texto]
-            let letraLimpia = letra.replace(/\[(.*?)\]/g, '<span class="letra-enfasis">$1</span>');
-            document.getElementById('modal-letra').innerHTML = letraLimpia;
+            // PROCESAR LETRA: Si no hay letra, avisamos
+            if (!letra || letra === "") {
+                document.getElementById('modal-letra').innerHTML = "<p style='opacity:0.5; text-align:center;'>Letra en proceso de carga...</p>";
+            } else {
+                // Procesar énfasis [texto] y saltos de línea
+                let letraLimpia = letra.replace(/\[(.*?)\]/g, '<span class="letra-enfasis">$1</span>');
+                document.getElementById('modal-letra').innerHTML = letraLimpia;
+            }
             
-            document.getElementById('modal-himno').style.display = 'block';
+            // Ajustamos fondo para que sea un pelín más transparente y se vea el logo/fondo
+            const modal = document.getElementById('modal-himno');
+            modal.style.backgroundColor = "rgba(22, 40, 68, 0.94)";
+            modal.style.display = 'block';
             document.body.style.overflow = 'hidden';
         }
 
