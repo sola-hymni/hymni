@@ -143,14 +143,12 @@
         }
 
         // 2. RENDERIZAR LISTA FILTRADA POR FECHA
-        // 2. RENDERIZAR LISTA FILTRADA POR FECHA
         function renderizarLista() {
             const listaDiv = document.getElementById('lista-himnos');
             const hoy = new Date();
             hoy.setHours(0, 0, 0, 0);
 
             const publicables = todosLosHimnos.filter(h => {
-                // Buscamos la fecha aunque se llame Fecha o Fecha_Publicacion
                 const fechaStr = h.Fecha_Publicacion || h.Fecha || h.fecha;
                 if (!fechaStr) return false;
                 const [dia, mes, anio] = fechaStr.split('/');
@@ -163,26 +161,38 @@
                 return;
             }
 
-            listaDiv.innerHTML = publicables.map(h => {
-                // Definimos las variables capturando posibles variaciones de nombre en el Excel
-                const titulo = h.Titulo_Himno || h.Titulo || h.titulo || "Sin título";
-                const fecha = h.Fecha_Publicacion || h.Fecha || "";
-                const fuente = h.Fuente_Himnario || h.Fuente || "";
-                const numero = h.Numero_Himnario || h.Numero || "";
-                const letra = (h.Letra_Himno || h.Letra || h.letra || "").replace(/`/g, "'"); // Limpieza de comillas
-                const autor = h.Compositor || h.Autor || h.autor || "Anónimo";
-                const anioComp = h.Anio_Composicion || h.Anio || h.año || "";
-                const biblia = h.Texto_Biblico || h.Texto || h.Referencia || "";
-
+            listaDiv.innerHTML = ''; // Limpiamos
+            
+            publicables.forEach((h, index) => {
+                const titulo = h.Titulo_Himno || h.Titulo || "Sin título";
+                const fecha = h.Fecha_Publicacion || "";
+                const fuente = h.Fuente_Himnario || "";
+                const numero = h.Numero_Himnario || "";
                 const metaData = `${fecha} | ${fuente} #${numero}`;
 
-                return `
-                    <div class="himno-item" onclick="abrirModal(\`${titulo}\`, \`${metaData}\`, \`${letra}\`, \`${autor}\`, \`${anioComp}\`, \`${biblia}\`)">
-                        <div class="himno-meta">${metaData}</div>
-                        <div class="himno-titulo">${titulo}</div>
-                    </div>
+                const item = document.createElement('div');
+                item.className = 'himno-item';
+                // Usamos una función anónima para evitar problemas de comillas en el HTML
+                item.onclick = () => prepararModal(h);
+                
+                item.innerHTML = `
+                    <div class="himno-meta">${metaData}</div>
+                    <div class="himno-titulo">${titulo}</div>
                 `;
-            }).join('');
+                listaDiv.appendChild(item);
+            });
+        }
+
+        // 3. NUEVA FUNCIÓN INTERMEDIA PARA SEGURIDAD
+        function prepararModal(h) {
+            const titulo = h.Titulo_Himno || h.Titulo || "Sin título";
+            const meta = `${h.Fecha_Publicacion || ''} | ${h.Fuente_Himnario || ''} #${h.Numero_Himnario || ''}`;
+            const letra = h.Letra_Himno || h.Letra || "";
+            const autor = h.Compositor || h.Autor || "Anónimo";
+            const anio = h.Anio_Composicion || h.Anio || "";
+            const biblico = h.Texto_Biblico || h.Texto || "";
+
+            abrirModal(titulo, meta, letra, autor, anio, biblico);
         }
 
         function iniciarApp() {
