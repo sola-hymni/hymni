@@ -219,7 +219,7 @@
                 ytCont.style.display = 'block';
             } else { ytCont.style.display = 'none'; }
 
-            // Partitura e Imprimibles (Lógica optimizada)
+// Partitura e Imprimibles (Versión con soporte multiformato)
             const scoreCont = document.getElementById('modal-score-container');
             const downloadLink = document.getElementById('download-link');
             const scoreImg = document.getElementById('score-img');
@@ -227,25 +227,27 @@
             if (h.ID_Imagen_Imprimible && h.ID_Imagen_Imprimible !== 'nan') {
                 const nombreBase = h.ID_Imagen_Imprimible.trim();
                 
-                // 1. Mostrar vista previa (Imagen)
+                // Intentar cargar JPG por defecto
                 scoreImg.src = "imprimibles/" + nombreBase + ".jpg";
+                
+                // Si falla el .jpg, intentamos con .jpeg
+                scoreImg.onerror = function() {
+                    if (this.src.includes(".jpg")) {
+                        this.src = "imprimibles/" + nombreBase + ".jpeg";
+                    } else {
+                        // Si también falla .jpeg, podrías probar .png o simplemente ocultar si no existe
+                        this.onerror = null; 
+                    }
+                };
+
                 scoreCont.style.display = 'block';
 
-                // 2. Configurar descarga (PDF)
+                // Configurar descarga (PDF siempre es el estándar)
                 downloadLink.href = "imprimibles/" + nombreBase + ".pdf";
                 downloadLink.setAttribute('download', nombreBase + ".pdf");
                 downloadLink.style.display = 'inline-block';
             } else { 
                 scoreCont.style.display = 'none'; 
-            }
-            // Publicidad Dinámica
-            const publiCont = document.getElementById('publi-contenido');
-            if (h.Banner_Anunciante && h.Banner_Anunciante !== 'nan') {
-                publiCont.innerHTML = `<img src="static/banners/${h.Banner_Anunciante}" style="width: 100%; max-width: 350px; border-radius: 4px;">`;
-            } else {
-                publiCont.innerHTML = `
-                    <p style="font-size: 0.75rem; opacity: 0.4; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;">Espacio Publicitario Disponible</p>
-                    <a href="mailto:sola.hymni@gmail.com" style="color: #a5b4fc; font-size: 0.9rem; text-decoration: none;">Contacto: sola.hymni@gmail.com</a>`;
             }
 
             // Letra con énfasis []
