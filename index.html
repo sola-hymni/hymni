@@ -219,19 +219,25 @@
                 ytCont.style.display = 'block';
             } else { ytCont.style.display = 'none'; }
 
-            // Partitura e Imprimibles
-            const scoreCont = document.getElementById('modal-score-container');
-            if (h.Archivo_Imagen && h.Archivo_Imagen !== 'nan') {
-                document.getElementById('score-img').src = "imprimibles/" + h.Archivo_Imagen;
-                scoreCont.style.display = 'block';
-                // Lógica de descarga Drive
-                if (h.ID_Imagen_Imprimible) {
-                    const cleanID = h.ID_Imagen_Imprimible.includes('d/') ? h.ID_Imagen_Imprimible.split('d/')[1].split('/')[0] : h.ID_Imagen_Imprimible;
-                    document.getElementById('download-link').href = "https://drive.google.com/uc?export=download&id=" + cleanID;
-                    document.getElementById('download-link').style.display = 'inline-block';
-                }
-            } else { scoreCont.style.display = 'none'; }
+            // Partitura e Imprimibles (Lógica optimizada)
+            const scoreCont = document.getElementById('modal-score-container');
+            const downloadLink = document.getElementById('download-link');
+            const scoreImg = document.getElementById('score-img');
 
+            if (h.ID_Imagen_Imprimible && h.ID_Imagen_Imprimible !== 'nan') {
+                const nombreBase = h.ID_Imagen_Imprimible.trim();
+                
+                // 1. Mostrar vista previa (Imagen)
+                scoreImg.src = "imprimibles/" + nombreBase + ".jpg";
+                scoreCont.style.display = 'block';
+
+                // 2. Configurar descarga (PDF)
+                downloadLink.href = "imprimibles/" + nombreBase + ".pdf";
+                downloadLink.setAttribute('download', nombreBase + ".pdf");
+                downloadLink.style.display = 'inline-block';
+            } else { 
+                scoreCont.style.display = 'none'; 
+            }
             // Publicidad Dinámica
             const publiCont = document.getElementById('publi-contenido');
             if (h.Banner_Anunciante && h.Banner_Anunciante !== 'nan') {
