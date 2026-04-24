@@ -2,208 +2,197 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>hymni</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-dark: #0f172a;
-            --card-bg: #1e293b;
-            --accent: #a5b4fc;
-            --text-main: #f1f5f9;
-            --text-dim: #94a3b8;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
+        /* TUS ESTILOS ORIGINALES RESTAURADOS */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            line-height: 1.6;
-            overflow-x: hidden;
+            font-family: 'Georgia', serif;
+            background-color: #162844;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+            background-size: 30px 30px;
+            background-attachment: fixed;
+            color: white;
+            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        /* Contenedor Principal */
-        .app-container { max-width: 500px; margin: 0 auto; padding: 20px; }
-
-        header { text-align: center; margin-bottom: 30px; padding-top: 20px; }
-        header h1 { 
-            font-family: 'Libre+Baskerville', serif; 
-            font-size: 2.5rem; 
-            letter-spacing: -1px;
-            color: var(--accent);
+        /* Splash Screen */
+        #splash {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #162844; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 9999;
+            transition: opacity 1s ease; cursor: pointer;
         }
-        header p { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; color: var(--text-dim); }
+        .heartbeat { width: 140px; animation: beat 1.5s infinite; mix-blend-mode: screen; }
+        @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
-        /* Lista de Himnos */
-        .himno-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-            border: 1px solid rgba(255,255,255,0.05);
+        /* Botón de Audio Restaurado */
+        #audio-control {
+            position: fixed; top: 20px; right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white; padding: 8px 12px; border-radius: 50px;
+            cursor: pointer; z-index: 1000; font-family: sans-serif;
+            font-size: 0.7rem; letter-spacing: 1px; display: none;
+            transition: background 0.3s;
         }
-        .himno-card:active { transform: scale(0.98); }
-        .himno-card h2 { font-family: 'Libre+Baskerville', serif; font-size: 1.2rem; margin-bottom: 5px; }
-        .himno-card p { font-size: 0.85rem; color: var(--text-dim); }
+        #audio-control:hover { background: rgba(255, 255, 255, 0.2); }
 
-        /* Modal */
-        #modal-himno {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-dark);
-            z-index: 1000;
-            overflow-y: auto;
-            padding: 30px 20px;
-        }
-
-        .modal-content { max-width: 600px; margin: 0 auto; position: relative; }
-        .close-btn { 
-            position: sticky; top: 0; float: right; font-size: 1.5rem; 
-            background: none; border: none; color: var(--accent); padding: 10px;
-        }
-
-        .modal-header { text-align: center; margin-bottom: 30px; }
-        .modal-header h2 { font-family: 'Libre+Baskerville', serif; font-size: 1.8rem; margin-bottom: 10px; color: var(--accent); }
-        .modal-meta { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; }
-
-        /* Secciones del Modal */
-        .seccion { margin-bottom: 30px; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 12px; }
-        .seccion-titulo { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 15px; display: block; }
+        /* Contenido Principal */
+        #main-content { display: none; width: 100%; max-width: 500px; padding: 40px 20px; text-align: center; }
+        .logo-mini { width: 120px; margin-bottom: 25px; mix-blend-mode: screen; opacity: 0.9; }
         
-        #modal-biblico { font-style: italic; font-family: 'Libre+Baskerville', serif; font-size: 1.1rem; }
-        #modal-letra { white-space: pre-line; font-family: 'Libre+Baskerville', serif; font-size: 1.15rem; text-align: center; line-height: 1.8; }
-        .letra-enfasis { color: var(--accent); font-weight: bold; }
-
-        /* Imágenes y Botones */
-        #score-img { width: 100%; border-radius: 8px; margin-bottom: 15px; }
-        .btn-action {
-            display: inline-block; width: 100%; padding: 15px; margin-top: 10px;
-            background: transparent; border: 1px solid var(--accent); color: var(--accent);
-            text-decoration: none; text-align: center; border-radius: 8px; font-weight: 600;
-            transition: all 0.3s;
+        .slogan {
+            font-size: 0.5rem; letter-spacing: 3px; text-transform: uppercase;
+            opacity: 0.5; margin-bottom: 12px; line-height: 1.6;
+            font-family: 'Arial', sans-serif; font-weight: bold;
         }
-        .btn-action:hover { background: var(--accent); color: var(--bg-dark); }
 
-        footer { text-align: center; padding: 40px; font-size: 0.7rem; color: var(--text-dim); opacity: 0.5; }
+        .subtitulo-app {
+            font-weight: 300; font-style: italic; font-size: 1rem;
+            margin-bottom: 30px; color: rgba(255, 255, 255, 0.95);
+            letter-spacing: 1px;
+        }
+
+        .divisor { border: 0; border-top: 1px solid rgba(255,255,255,0.1); width: 60%; margin: 0 auto 30px auto; }
+
+        .himno-item { text-align: left; padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+        .himno-meta { font-size: 0.7rem; opacity: 0.5; margin-bottom: 5px; }
+        .himno-titulo { font-size: 1.1rem; font-weight: 400; color: #fff; }
+
+        /* Estilos del Modal */
+        #modal-himno {
+            display: none; position: fixed; z-index: 2000;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(22, 40, 68, 0.98);
+            overflow-y: auto; padding: 40px 20px;
+        }
+        .modal-content { max-width: 500px; margin: 0 auto; text-align: left; }
+        .btn-cerrar { position: fixed; top: 20px; right: 20px; background: none; border: none; color: white; font-size: 2rem; cursor: pointer; opacity: 0.5; }
+        
+        .himno-letra { white-space: pre-line; line-height: 1.8; font-size: 1.2rem; margin-top: 25px; color: rgba(255,255,255,0.95); font-family: 'Georgia', serif; }
+        .letra-enfasis { font-style: italic; color: #a5b4fc; margin: 15px 0; display: block; }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
+    <div id="splash" onclick="iniciarApp()">
+        <img src="static/Logo_hymni.jpg" class="heartbeat">
+        <h1 style="letter-spacing: 12px; font-weight: 300; margin-top: 20px;">hymni</h1>
+        <p style="font-family: Arial; font-size: 0.7rem; margin-top: 30px; letter-spacing: 4px; opacity: 0.5;">TOCA PARA ENTRAR</p>
+    </div>
+
+    <button id="audio-control" onclick="toggleAudio()">PAUSAR MÚSICA</button>
+    <audio id="intro" src="static/intro.mp3" loop></audio>
+
+    <div id="main-content">
         <header>
-            <h1>hymni</h1>
-            <p>Sola Scriptura • Sola Fide</p>
+            <img src="static/Logo_hymni.jpg" class="logo-mini" style="margin-bottom: 5px;">
+            <h1 style="letter-spacing: 12px; font-weight: 300; margin: 0; font-size: 2.2rem; color: white;">hymni</h1>
+            <p style="font-family: Arial; font-size: 0.55rem; opacity: 0.5; letter-spacing: 2px; margin-bottom: 15px;">Versión 1.0. Derechos reservados.</p>
+            <div class="slogan">Sola Fide • Sola Gratia • Sola Scriptura <br> Solus Christus • Soli Deo Gloria</div>
+            <h2 class="subtitulo-app">Aquí, solo himnos</h2>
+            <hr class="divisor">
         </header>
 
         <div id="lista-himnos">
             </div>
 
-        <footer>
-            &copy; 2026 HYMNI PROYECTO
-        </footer>
-    </div>
-
-    <div id="modal-himno">
-        <div class="modal-content">
-            <button class="close-btn" onclick="cerrarModal()">✕</button>
-            
-            <div class="modal-header">
-                <h2 id="modal-titulo"></h2>
-                <div class="modal-meta" id="modal-meta"></div>
-                <div id="modal-autoria" style="font-size: 0.85rem; margin-top: 5px;"></div>
-            </div>
-
-            <div class="seccion" id="seccion-biblica">
-                <span class="seccion-titulo">Texto Bíblico</span>
-                <div id="modal-biblico"></div>
-            </div>
-
-            <div class="seccion">
-                <span class="seccion-titulo">Letra del Himno</span>
-                <div id="modal-letra"></div>
-            </div>
-
-            <div class="seccion" id="modal-audio-link" style="display:none;">
-                <span class="seccion-titulo">Multimedia</span>
-                <a id="youtube-link" href="#" target="_blank" class="btn-action">VER EN YOUTUBE</a>
-            </div>
-
-            <div class="seccion" id="modal-score-container" style="display:none;">
-                <span class="seccion-titulo">Partitura e Imprimible</span>
-                <img id="score-img" src="" alt="Partitura">
-                <a id="download-link" href="#" target="_blank" class="btn-action">DESCARGAR PDF PARA IMPRIMIR</a>
-            </div>
-
-            <div class="seccion" id="modal-historia-container">
-                <span class="seccion-titulo">Historia Detrás del Himno</span>
-                <div id="modal-historia" style="font-size: 0.95rem; color: var(--text-dim);"></div>
-            </div>
-
-            <div class="seccion" id="publi-container" style="text-align: center; background: none; border: 1px dashed rgba(255,255,255,0.1);">
-                <div id="publi-contenido"></div>
-            </div>
+        <div id="publicidad-listado" style="text-align: center; margin-top: 50px; padding: 30px 20px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); border-radius: 16px; margin-bottom: 50px; margin-left: 10px; margin-right: 10px;">
+            <p style="font-size: 0.75rem; opacity: 0.4; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;">Espacio Publicitario Disponible</p>
+            <p style="font-size: 0.95rem; opacity: 0.7; margin-bottom: 10px; font-style: italic;">Tu empresa puede anunciar aquí.</p>
+            <a href="mailto:sola.hymni@gmail.com" style="color: #a5b4fc; font-size: 0.9rem; text-decoration: none; border-bottom: 1px solid rgba(165, 180, 252, 0.3);">Contacto: sola.hymni@gmail.com</a>
         </div>
     </div>
 
+    <div id="modal-himno">
+        <button class="btn-cerrar" onclick="cerrarModal()">&times;</button>
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; width: 100%;">
+                <div id="modal-meta" class="himno-meta" style="margin: 0; padding: 0;"></div>
+                <button id="audioBtnModal" onclick="toggleAudio()" style="background: none; border: 1px solid rgba(255,255,255,0.4); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; white-space: nowrap;">ESCUCHAR INTRO</button>
+            </div>
+
+            <img src="static/Logo_hymni.jpg" style="width: 80px; display: block; margin: 0 auto 20px auto; mix-blend-mode: screen; opacity: 0.8;">
+            <h2 id="modal-titulo" style="margin-bottom: 5px; text-align: center;"></h2>
+            <div id="modal-autoria" style="text-align: center; font-size: 0.85rem; opacity: 0.75; font-style: italic; margin-bottom: 15px;"></div>
+            <hr class="divisor">
+            
+            <div id="seccion-biblica" style="display:none; text-align:center;">
+                <p style="font-size: 0.70rem; opacity: 0.5; letter-spacing: 2px; margin-bottom: 4px; text-transform: uppercase;">Texto bíblico asociado</p>
+                <div id="modal-biblico" style="font-size: 0.95rem; font-weight: bold; color: #a5b4fc;"></div>
+            </div>
+
+            <div id="modal-historia" style="font-size: 0.9rem; opacity: 0.8; text-align: justify; margin: 20px auto; max-width: 90%; line-height: 1.6; font-style: italic; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; display:none;"></div>
+
+            <hr class="divisor">
+
+            <div id="modal-audio-link" style="text-align: center; margin: 15px 0; display: none;">
+                <a id="youtube-link" href="#" target="_blank" style="color: #a5b4fc; font-size: 0.85rem; text-decoration: none; border: 1px solid #a5b4fc; padding: 5px 15px; border-radius: 15px;">▶ ESCUCHAR EN YOUTUBE</a>
+            </div>
+
+            <div id="modal-score-container" style="text-align: center; margin: 20px 0; display: none;">
+                <p style="font-size: 0.7rem; opacity: 0.5; letter-spacing: 2px; margin-bottom: 10px;">PARTITURA ORIGINAL</p>
+                <img id="score-img" src="" style="width: 75%; border-radius: 5px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1);">
+                <br>
+                <a id="download-link" href="#" target="_blank" style="color: #fff; font-size: 0.8rem; text-decoration: none; background: rgba(255,255,255,0.1); padding: 8px 20px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.2);">⬇ DESCARGAR PARA IMPRIMIR (PDF/JPG)</a>
+            </div>
+
+            <div id="modal-publicidad" style="text-align: center; margin-top: 40px; padding: 25px 20px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); border-radius: 16px;">
+                <div id="publi-contenido">
+                    </div>
+            </div>
+
+            <div id="modal-letra" class="himno-letra"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script>
-        const SHEET_ID = '1XJ-MzLjds3Pe_YXOqnEgQQnPwpcvIORgnz9jSlwwaj4'; // Asegúrate de que sea el ID correcto
-        const TAB_NAME = 'Hoja 1'; // El nombre de la pestaña en tu Sheet
-        const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${TAB_NAME}`;
+        const CSV_URL = "https://docs.google.com/spreadsheets/d/1XJ-MzLjds3Pe_YXOqnEgQQnPwpcvIORgnz9jSlwwaj4/gviz/tq?tqx=out:csv";
+        const audio = document.getElementById('intro');
+        const audioBtn = document.getElementById('audio-control');
+        let todosLosHimnos = [];
 
-        async function cargarHimnos() {
-            try {
-                const response = await fetch(CSV_URL);
-                const data = await response.text();
-                const filas = data.split('\n').slice(1);
-                
-                const himnos = filas.map(f => {
-                    const c = f.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(x => x.replace(/^"|"$/g, ''));
-                    return {
-                        Fecha_Publicacion: c[0],
-                        Titulo_Himno: c[1],
-                        Fuente_Himnario: c[2],
-                        Numero_Himnario: c[3],
-                        Texto_Biblico: c[4],
-                        Compositor: c[5],
-                        Anio_Composicion: c[6],
-                        ID_Imagen_Imprimible: c[7], // TU COLUMNA CLAVE
-                        URL_Audio: c[8],
-                        Letra_Himno: c[9],
-                        Historia_Corta: c[10],
-                        Banner_Anunciante: c[11]
-                    };
-                });
+        function cargarDatos() {
+            Papa.parse(CSV_URL, {
+                download: true, header: true,
+                complete: function(results) {
+                    todosLosHimnos = results.data;
+                    renderizarLista();
+                }
+            });
+        }
 
-                const hoy = new Date().toISOString().split('T')[0];
-                const listaContenedor = document.getElementById('lista-himnos');
+        function renderizarLista() {
+            const listaDiv = document.getElementById('lista-himnos');
+            const hoy = new Date(); hoy.setHours(0,0,0,0);
 
-                // Filtrar por fecha (Publicar solo los de hoy o anteriores)
-                const publicados = himnos.filter(h => h.Fecha_Publicacion <= hoy);
+            const publicables = todosLosHimnos.filter(h => {
+                const f = h.Fecha_Publicacion || h.Fecha;
+                if (!f) return false;
+                const [d, m, a] = f.split('/');
+                return new Date(a, m - 1, d) <= hoy;
+            }).reverse();
 
-                publicados.reverse().forEach(h => {
-                    const card = document.createElement('div');
-                    card.className = 'himno-card';
-                    card.innerHTML = `
-                        <h2>${h.Titulo_Himno}</h2>
-                        <p>${h.Fuente_Himnario} #${h.Numero_Himnario} • ${h.Fecha_Publicacion}</p>
-                    `;
-                    card.onclick = () => abrirModal(h);
-                    listaContenedor.appendChild(card);
-                });
-
-            } catch (error) {
-                console.error("Error cargando datos:", error);
-            }
+            listaDiv.innerHTML = '';
+            publicables.forEach(h => {
+                const item = document.createElement('div');
+                item.className = 'himno-item';
+                item.onclick = () => abrirModal(h);
+                item.innerHTML = `
+                    <div class="himno-meta">${h.Fecha_Publicacion} | ${h.Fuente_Himnario} #${h.Numero_Himnario}</div>
+                    <div class="himno-titulo">${h.Titulo_Himno}</div>
+                `;
+                listaDiv.appendChild(item);
+            });
         }
 
         function abrirModal(h) {
+            audio.pause(); audioBtn.innerText = "REPRODUCIR";
+
             // Datos básicos
             document.getElementById('modal-titulo').innerText = h.Titulo_Himno;
             document.getElementById('modal-meta').innerHTML = `${h.Fecha_Publicacion} • ${h.Fuente_Himnario} #${h.Numero_Himnario}`;
@@ -220,42 +209,42 @@
             const histDiv = document.getElementById('modal-historia');
             if (h.Historia_Corta && h.Historia_Corta !== 'nan') {
                 histDiv.innerText = h.Historia_Corta;
-                histDiv.parentElement.style.display = 'block';
-            } else { histDiv.parentElement.style.display = 'none'; }
+                histDiv.style.display = 'block';
+            } else { histDiv.style.display = 'none'; }
 
-            // Lógica Híbrida Partituras (JPG + PDF)
+            // YouTube
+            const ytCont = document.getElementById('modal-audio-link');
+            if (h.URL_Audio && h.URL_Audio !== 'nan') {
+                document.getElementById('youtube-link').href = h.URL_Audio;
+                ytCont.style.display = 'block';
+            } else { ytCont.style.display = 'none'; }
+
+            // Partitura e Imprimibles
             const scoreCont = document.getElementById('modal-score-container');
-            const imgElement = document.getElementById('score-img');
-            const downLink = document.getElementById('download-link');
-            let nombreBase = h.ID_Imagen_Imprimible || "";
-
-            if (nombreBase && nombreBase !== 'nan' && nombreBase.trim() !== "") {
-                nombreBase = nombreBase.trim();
-                imgElement.src = `imprimibles/${nombreBase}.jpg`;
-                downLink.href = `imprimibles/${nombreBase}.pdf`;
+            if (h.Archivo_Imagen && h.Archivo_Imagen !== 'nan') {
+                document.getElementById('score-img').src = "imprimibles/" + h.Archivo_Imagen;
                 scoreCont.style.display = 'block';
+                // Lógica de descarga Drive
+                if (h.ID_Imagen_Imprimible) {
+                    const cleanID = h.ID_Imagen_Imprimible.includes('d/') ? h.ID_Imagen_Imprimible.split('d/')[1].split('/')[0] : h.ID_Imagen_Imprimible;
+                    document.getElementById('download-link').href = "https://drive.google.com/uc?export=download&id=" + cleanID;
+                    document.getElementById('download-link').style.display = 'inline-block';
+                }
+            } else { scoreCont.style.display = 'none'; }
+
+            // Publicidad Dinámica
+            const publiCont = document.getElementById('publi-contenido');
+            if (h.Banner_Anunciante && h.Banner_Anunciante !== 'nan') {
+                publiCont.innerHTML = `<img src="static/banners/${h.Banner_Anunciante}" style="width: 100%; max-width: 350px; border-radius: 4px;">`;
             } else {
-                scoreCont.style.display = 'none';
+                publiCont.innerHTML = `
+                    <p style="font-size: 0.75rem; opacity: 0.4; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;">Espacio Publicitario Disponible</p>
+                    <a href="mailto:sola.hymni@gmail.com" style="color: #a5b4fc; font-size: 0.9rem; text-decoration: none;">Contacto: sola.hymni@gmail.com</a>`;
             }
 
             // Letra con énfasis []
             let letraLimpia = (h.Letra_Himno || "").replace(/\[(.*?)\]/g, '<span class="letra-enfasis">$1</span>');
             document.getElementById('modal-letra').innerHTML = letraLimpia;
-
-            // YouTube
-            const ytCont = document.getElementById('modal-audio-link');
-            if (h.URL_Audio && h.URL_Audio.includes('http')) {
-                document.getElementById('youtube-link').href = h.URL_Audio;
-                ytCont.style.display = 'block';
-            } else { ytCont.style.display = 'none'; }
-
-            // Publicidad
-            const publiCont = document.getElementById('publi-contenido');
-            if (h.Banner_Anunciante && h.Banner_Anunciante !== 'nan') {
-                publiCont.innerHTML = `<img src="static/banners/${h.Banner_Anunciante}" style="width: 100%; border-radius: 8px;">`;
-            } else {
-                publiCont.innerHTML = `<p style="font-size:0.7rem; opacity:0.5;">Contacto: sola.hymni@gmail.com</p>`;
-            }
 
             document.getElementById('modal-himno').style.display = 'block';
             document.body.style.overflow = 'hidden';
@@ -266,7 +255,23 @@
             document.body.style.overflow = 'auto';
         }
 
-        window.onload = cargarHimnos;
+        function iniciarApp() {
+            audio.play().catch(e => console.log("Audio waiting..."));
+            document.getElementById('splash').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('splash').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                audioBtn.style.display = 'block';
+            }, 800);
+        }
+
+        function toggleAudio() {
+            if (audio.paused) { audio.play(); audioBtn.innerText = "PAUSAR MÚSICA"; }
+            else { audio.pause(); audioBtn.innerText = "REPRODUCIR"; }
+        }
+
+        window.onload = cargarDatos;
     </script>
+    <script data-goatcounter="https://hymni.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
