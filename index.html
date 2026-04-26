@@ -221,34 +221,43 @@
                 ytCont.style.display = 'block';
             } else { ytCont.style.display = 'none'; }
 
-// Partitura e Imprimibles (Versión con soporte multiformato)
-            const scoreCont = document.getElementById('modal-score-container');
+// Partitura e Imprimibles (Versión TODOTERRENO)
+            const scoreCont = document.getElementById('modal-score-container');
             const downloadLink = document.getElementById('download-link');
             const scoreImg = document.getElementById('score-img');
 
-            if (h.ID_Imagen_Imprimible && h.ID_Imagen_Imprimible !== 'nan') {
+            if (h.ID_Imagen_Imprimible && h.ID_Imagen_Imprimible !== 'nan') {
                 const nombreBase = h.ID_Imagen_Imprimible.trim();
                 
-                // Intentar cargar JPG por defecto
-                scoreImg.src = "imprimibles/" + nombreBase + ".jpg";
+                // 1. Intentar cargar .jpg (minúsculas)
+                scoreImg.src = "imprimibles/" + nombreBase + ".jpg";
                 
-                // Si falla el .jpg, intentamos con .jpeg
                 scoreImg.onerror = function() {
+                    // 2. Si falla el .jpg, probamos con .JPG (Mayúsculas de Windows)
                     if (this.src.includes(".jpg")) {
+                        this.src = "imprimibles/" + nombreBase + ".JPG";
+                    } 
+                    // 3. Si falla .JPG, intentamos con .jpeg
+                    else if (this.src.includes(".JPG")) {
                         this.src = "imprimibles/" + nombreBase + ".jpeg";
+                    } 
+                    // 4. Si falla .jpeg, intentamos con .png por si acaso
+                    else if (this.src.includes(".jpeg")) {
+                        this.src = "imprimibles/" + nombreBase + ".png";
                     } else {
-                        // Si también falla .jpeg, podrías probar .png o simplemente ocultar si no existe
+                        // Si nada funciona, ocultamos el contenedor para no ver el ícono roto
+                        scoreCont.style.display = 'none';
                         this.onerror = null; 
                     }
                 };
 
-                scoreCont.style.display = 'block';
+                scoreCont.style.display = 'block';
 
-                // Configurar descarga (PDF siempre es el estándar)
+                // Configurar descarga (PDF)
                 downloadLink.href = "imprimibles/" + nombreBase + ".pdf";
                 downloadLink.setAttribute('download', nombreBase + ".pdf");
                 downloadLink.style.display = 'inline-block';
-            } else { 
+            } else { 
                 scoreCont.style.display = 'none'; 
             }
 
