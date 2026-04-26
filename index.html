@@ -91,7 +91,8 @@
         <header>
             <img src="static/Logo_hymni.jpg" class="logo-mini" style="margin-bottom: 5px;">
             <h1 style="letter-spacing: 12px; font-weight: 300; margin: 0; font-size: 2.2rem; color: white;">hymni</h1>
-            <p style="font-family: Arial; font-size: 0.55rem; opacity: 0.5; letter-spacing: 2px; margin-bottom: 15px;">Versión 1.0. Derechos reservados.</p>
+            <p style="font-family: Arial; font-size: 0.55rem; opacity: 0.5; letter-spacing: 2px; margin-bottom: 25px;">Versión 1.0</p>
+ 
             <div class="slogan">Sola Fide • Sola Gratia • Sola Scriptura <br> Solus Christus • Soli Deo Gloria</div>
             <h2 class="subtitulo-app">Aquí, solo himnos</h2>
             <hr class="divisor">
@@ -101,10 +102,11 @@
             </div>
 
         <div id="publicidad-listado" style="text-align: center; margin-top: 50px; padding: 30px 20px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); border-radius: 16px; margin-bottom: 50px; margin-left: 10px; margin-right: 10px;">
-            <p style="font-size: 0.75rem; opacity: 0.4; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;">Espacio Publicitario Disponible</p>
-            <p style="font-size: 0.95rem; opacity: 0.7; margin-bottom: 10px; font-style: italic;">Tu empresa puede anunciar aquí.</p>
-            <a href="mailto:sola.hymni@gmail.com" style="color: #a5b4fc; font-size: 0.9rem; text-decoration: none; border-bottom: 1px solid rgba(165, 180, 252, 0.3);">Contacto: sola.hymni@gmail.com</a>
+            <p style="font-size: 0.6rem; opacity: 0.3; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">Espacio Publicitario Disponible</p>
+            <p style="font-size: 0.8rem; opacity: 0.5; margin-bottom: 8px; font-style: italic;">Tu empresa puede anunciar aquí.</p>
+            <a href="mailto:sola.hymni@gmail.com" style="color: #a5b4fc; font-size: 0.75rem; opacity: 0.5; text-decoration: none; border-bottom: 1px solid rgba(165, 180, 252, 0.2);">Contacto: sola.hymni@gmail.com</a>
         </div>
+    
     </div>
 
     <div id="modal-himno">
@@ -249,6 +251,21 @@
             } else { 
                 scoreCont.style.display = 'none'; 
             }
+
+            // Publicidad Dinámica en el Modal
+            const publiContenedor = document.getElementById('publi-contenido');
+            if (publiContenedor) {
+                if (h.Banner_Anunciante && h.Banner_Anunciante !== 'nan' && h.Banner_Anunciante !== 'None' && h.Banner_Anunciante.trim() !== "") {
+                    publiContenedor.innerHTML = `<img src="static/banners/${h.Banner_Anunciante}" style="width: 100%; max-width: 350px; border-radius: 4px;">`;
+                } else {
+                    publiContenedor.innerHTML = `
+                        <p style="font-size: 0.6rem; opacity: 0.3; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">Espacio Publicitario Disponible</p>
+                        <p style="font-size: 0.8rem; opacity: 0.5; margin-bottom: 8px; font-style: italic;">Tu empresa puede anunciar aquí.</p>
+                        <a href="mailto:sola.hymni@gmail.com" style="color: #a5b4fc; font-size: 0.75rem; opacity: 0.5; text-decoration: none; border-bottom: 1px solid rgba(165, 180, 252, 0.2);">Contacto: sola.hymni@gmail.com</a>
+                    `;
+                }
+            }
+
 
             // Letra con énfasis []
             let letraLimpia = (h.Letra_Himno || "").replace(/\[(.*?)\]/g, '<span class="letra-enfasis">$1</span>');
