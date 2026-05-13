@@ -43,7 +43,7 @@
         /* Contenido Principal */
         #main-content { display: none; width: 100%; max-width: 500px; padding: 40px 20px; text-align: center; }
         .logo-mini { width: 120px; margin-bottom: 25px; mix-blend-mode: screen; opacity: 0.9; }
-        
+       
         .slogan {
             font-size: 0.5rem; letter-spacing: 3px; text-transform: uppercase;
             opacity: 0.5; margin-bottom: 12px; line-height: 1.6;
@@ -71,7 +71,7 @@
         }
         .modal-content { max-width: 500px; margin: 0 auto; text-align: left; }
         .btn-cerrar { position: fixed; top: 20px; right: 20px; background: none; border: none; color: white; font-size: 2rem; cursor: pointer; opacity: 0.5; }
-        
+       
         .himno-letra { white-space: pre-line; line-height: 1.8; font-size: 1.2rem; margin-top: 25px; color: rgba(255,255,255,0.95); font-family: 'Georgia', serif; }
         .letra-enfasis { font-style: italic; color: #a5b4fc; margin: 15px 0; display: block; }
     </style>
@@ -109,6 +109,12 @@
             <hr class="divisor">
         </header>
 
+        <div style="padding: 0 20px 20px 20px; text-align: center;">
+            <input type="text" id="inputBusquedaHymni" onkeyup="filtrarHimnos()" 
+                    placeholder="Busca por título o fecha (dd/mm/aaaa)..." 
+                    style="width: 100%; max-width: 400px; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: white; font-family: inherit; outline: none; text-align: center;">
+        </div>
+
         <div id="lista-himnos">
             </div>
 
@@ -117,7 +123,7 @@
             <p style="font-size: 0.8rem; opacity: 0.5; margin-bottom: 8px; font-style: italic;">Tu empresa puede anunciar aquí.</p>
             <a href="mailto:sola.hymni@gmail.com" style="color: #a5b4fc; font-size: 0.75rem; opacity: 0.5; text-decoration: none; border-bottom: 1px solid rgba(165, 180, 252, 0.2);">Contacto: sola.hymni@gmail.com</a>
         </div>
-    
+   
     </div>
 
     <div id="modal-himno">
@@ -132,7 +138,7 @@
             <h2 id="modal-titulo" style="margin-bottom: 5px; text-align: center;"></h2>
             <div id="modal-autoria" style="text-align: center; font-size: 0.85rem; opacity: 0.75; font-style: italic; margin-bottom: 15px;"></div>
             <hr class="divisor">
-            
+           
             <div id="seccion-biblica" style="display:none; text-align:center;">
                 <p style="font-size: 0.70rem; opacity: 0.5; letter-spacing: 2px; margin-bottom: 4px; text-transform: uppercase;">Texto bíblico asociado</p>
                 <div id="modal-biblico" style="font-size: 0.95rem; font-weight: bold; color: #a5b4fc;"></div>
@@ -203,6 +209,16 @@
             });
         }
 
+        function filtrarHimnos() {
+            let input = document.getElementById('inputBusquedaHymni').value.toLowerCase();
+            let himnos = document.getElementsByClassName('himno-item');
+    
+            for (let h of himnos) {
+                let info = h.innerText.toLowerCase();
+                h.style.display = info.includes(input) ? "block" : "none";
+            }
+        }
+
         function abrirModal(h) {
             audio.pause(); audioBtn.innerText = "REPRODUCIR";
 
@@ -232,33 +248,33 @@
                 ytCont.style.display = 'block';
             } else { ytCont.style.display = 'none'; }
 
-// Partitura e Imprimibles (Versión TODOTERRENO)
+            // Partitura e Imprimibles (Versión TODOTERRENO)
             const scoreCont = document.getElementById('modal-score-container');
             const downloadLink = document.getElementById('download-link');
             const scoreImg = document.getElementById('score-img');
 
             if (h.ID_Imagen_Imprimible && h.ID_Imagen_Imprimible !== 'nan') {
                 const nombreBase = h.ID_Imagen_Imprimible.trim();
-                
+               
                 // 1. Intentar cargar .jpg (minúsculas)
                 scoreImg.src = "imprimibles/" + nombreBase + ".jpg";
-                
+               
                 scoreImg.onerror = function() {
                     // 2. Si falla el .jpg, probamos con .JPG (Mayúsculas de Windows)
                     if (this.src.includes(".jpg")) {
                         this.src = "imprimibles/" + nombreBase + ".JPG";
-                    } 
+                    }
                     // 3. Si falla .JPG, intentamos con .jpeg
                     else if (this.src.includes(".JPG")) {
                         this.src = "imprimibles/" + nombreBase + ".jpeg";
-                    } 
+                    }
                     // 4. Si falla .jpeg, intentamos con .png por si acaso
                     else if (this.src.includes(".jpeg")) {
                         this.src = "imprimibles/" + nombreBase + ".png";
                     } else {
                         // Si nada funciona, ocultamos el contenedor para no ver el ícono roto
                         scoreCont.style.display = 'none';
-                        this.onerror = null; 
+                        this.onerror = null;
                     }
                 };
 
@@ -268,8 +284,8 @@
                 downloadLink.href = "imprimibles/" + nombreBase + ".pdf";
                 downloadLink.setAttribute('download', nombreBase + ".pdf");
                 downloadLink.style.display = 'inline-block';
-            } else { 
-                scoreCont.style.display = 'none'; 
+            } else {
+                scoreCont.style.display = 'none';
             }
 
             // Publicidad Dinámica en el Modal
