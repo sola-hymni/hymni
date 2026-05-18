@@ -113,10 +113,15 @@
             <input type="text" id="inputBusquedaHymni" onkeyup="filtrarHimnos()" 
                     placeholder="Busca por título o fecha (dd/mm/aaaa)..." 
                     style="width: 100%; max-width: 400px; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: white; font-family: inherit; outline: none; text-align: center;">
+            
+            <div id="abecedario-hymni" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; max-width: 400px; margin: 15px auto 0 auto;">
+                </div>
+
+            <hr style="border: 0; height: 1px; background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent); margin-top: 20px; max-width: 400px;">
         </div>
 
         <div id="lista-himnos">
-            </div>
+        </div>
 
         <div id="publicidad-listado" style="text-align: center; margin-top: 50px; padding: 30px 20px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.1); border-radius: 16px; margin-bottom: 50px; margin-left: 10px; margin-right: 10px;">
             <p style="font-size: 0.6rem; opacity: 0.3; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;">Espacio Publicitario Disponible</p>
@@ -181,6 +186,7 @@
                 complete: function(results) {
                     todosLosHimnos = results.data;
                     renderizarLista();
+                    inicializarAbecedario();
                 }
             });
         }
@@ -202,20 +208,90 @@
                 item.className = 'himno-item';
                 item.onclick = () => abrirModal(h);
                 item.innerHTML = `
-                    <div class="himno-meta">${h.Fecha_Publicacion} | ${h.Fuente_Himnario} #${h.Numero_Himnario}</div>
+                    <div class="himno-meta"><span class="solo-fecha">${h.Fecha_Publicacion}</span> | ${h.Fuente_Himnario} #${h.Numero_Himnario}</div>
                     <div class="himno-titulo">${h.Titulo_Himno}</div>
                 `;
                 listaDiv.appendChild(item);
             });
         }
 
+
+        // Función para generar e inyectar el abecedario en la pantalla // 
+        function inicializarAbecedario() {
+            const contenedor = document.getElementById('abecedario-hymni');
+            const letras = [
+                'A','B','C','D','E','F','G',
+                'H','I','J','K','L','M','N',
+                'Ñ','O','P','Q','R','S','T',
+                'U','V','W','X','Y','Z','All'
+            ];
+
+            contenedor.innerHTML = '';
+            letras.forEach(letra => {
+                const boton = document.createElement('button');
+                // El botón "All" (Ver Todos) tendrá un estilo sutilmente distinto
+                boton.innerHTML = letra === 'All' ? '&#x21BA;' : letra;
+        
+                // Estilos en línea para mantener consistencia con tu diseño actual
+                boton.style.padding = "8px 0";
+                boton.style.borderRadius = "4px";
+                boton.style.border = "1px solid rgba(255,255,255,0.15)";
+                boton.style.background = letra === 'All' ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.03)";
+                boton.style.color = "white";
+                boton.style.fontSize = "13px";
+                boton.style.cursor = "pointer";
+                boton.style.fontFamily = "inherit";
+
+                // Acción al hacer clic
+                boton.onclick = () => filtrarPorLetra(letra);
+                contenedor.appendChild(boton);
+            });
+        }
+
+// Función quirúrgica para filtrar los títulos por la letra seleccionada
+function filtrarPorLetra(letra) {
+    // Si presiona la 'X' (All), limpiamos el buscador de texto y mostramos todo
+    if (letra === 'All') {
+        document.getElementById('inputBusquedaHymni').value = '';
+        filtrarHimnos();
+        return;
+    }
+
+    let himnos = document.getElementsByClassName('himno-item');
+    let letraMinuscula = letra.toLowerCase();
+
+    // Limpiamos la barra de texto para evitar conflictos visuales
+    document.getElementById('inputBusquedaHymni').value = '';
+
+    for (let h of himnos) {
+        let tituloElemento = h.querySelector('.himno-titulo');
+        if (tituloElemento) {
+            // Quitamos espacios en blanco al inicio del título si los hay
+            let textoTitulo = tituloElemento.innerText.trim().toLowerCase();
+            
+            // Comparamos si el título empieza exactamente con la letra elegida
+            h.style.display = textoTitulo.startsWith(letraMinuscula) ? "block" : "none";
+        }
+    }
+}
+
+
         function filtrarHimnos() {
             let input = document.getElementById('inputBusquedaHymni').value.toLowerCase();
             let himnos = document.getElementsByClassName('himno-item');
     
             for (let h of himnos) {
-                let info = h.innerText.toLowerCase();
-                h.style.display = info.includes(input) ? "block" : "none";
+                let fechaElemento = h.querySelector('.solo-fecha');
+                let tituloElemento = h.querySelector('.himno-titulo');
+        
+                let contenidoFiltrable = "";
+                if (fechaElemento) contenidoFiltrable += fechaElemento.innerText.toLowerCase();
+                if (tituloElemento) contenidoFiltrable += " " + tituloElemento.innerText.toLowerCase();
+
+                // Si por alguna razón no encuentra las etiquetas, usa el texto completo como respaldo
+                if (!fechaElemento && !tituloElemento) contenidoFiltrable = h.innerText.toLowerCase();
+
+                h.style.display = contenidoFiltrable.includes(input) ? "block" : "none";
             }
         }
 
