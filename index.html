@@ -250,7 +250,6 @@
 
 // Función quirúrgica para filtrar los títulos por la letra seleccionada
 function filtrarPorLetra(letra) {
-    // Si presiona la 'X' (All), limpiamos el buscador de texto y mostramos todo
     if (letra === 'All') {
         document.getElementById('inputBusquedaHymni').value = '';
         filtrarHimnos();
@@ -260,40 +259,47 @@ function filtrarPorLetra(letra) {
     let himnos = document.getElementsByClassName('himno-item');
     let letraMinuscula = letra.toLowerCase();
 
-    // Limpiamos la barra de texto para evitar conflictos visuales
     document.getElementById('inputBusquedaHymni').value = '';
 
     for (let h of himnos) {
         let tituloElemento = h.querySelector('.himno-titulo');
         if (tituloElemento) {
-            // Quitamos espacios en blanco al inicio del título si los hay
             let textoTitulo = tituloElemento.innerText.trim().toLowerCase();
             
-            // Comparamos si el título empieza exactamente con la letra elegida
-            h.style.display = textoTitulo.startsWith(letraMinuscula) ? "block" : "none";
+            // CIRUGÍA: Limpiamos signos de puntuación al inicio para la comparación
+            let textoLimpio = textoTitulo.replace(/^[¡¿!?"'¿]+/g, '');
+            
+            // Ahora la comparación es infalible aunque comience con ¡ o ¿
+            h.style.display = textoLimpio.startsWith(letraMinuscula) ? "block" : "none";
         }
     }
 }
 
 
-        function filtrarHimnos() {
-            let input = document.getElementById('inputBusquedaHymni').value.toLowerCase();
-            let himnos = document.getElementsByClassName('himno-item');
+  function filtrarHimnos() {
+    let input = document.getElementById('inputBusquedaHymni').value.toLowerCase();
     
-            for (let h of himnos) {
-                let fechaElemento = h.querySelector('.solo-fecha');
-                let tituloElemento = h.querySelector('.himno-titulo');
+    // CIRUGÍA: Limpiamos los signos de lo que escribe el usuario por si acaso
+    let inputLimpio = input.replace(/[¡¿!?"'¿,.]/g, '');
+    
+    let himnos = document.getElementsByClassName('himno-item');
+    
+    for (let h of himnos) {
+        let fechaElemento = h.querySelector('.solo-fecha');
+        let tituloElemento = h.querySelector('.himno-titulo');
         
-                let contenidoFiltrable = "";
-                if (fechaElemento) contenidoFiltrable += fechaElemento.innerText.toLowerCase();
-                if (tituloElemento) contenidoFiltrable += " " + tituloElemento.innerText.toLowerCase();
+        let contenidoFiltrable = "";
+        if (fechaElemento) contenidoFiltrable += fechaElemento.innerText.toLowerCase();
+        if (tituloElemento) contenidoFiltrable += " " + tituloElemento.innerText.toLowerCase();
 
-                // Si por alguna razón no encuentra las etiquetas, usa el texto completo como respaldo
-                if (!fechaElemento && !tituloElemento) contenidoFiltrable = h.innerText.toLowerCase();
+        if (!fechaElemento && !tituloElemento) contenidoFiltrable = h.innerText.toLowerCase();
 
-                h.style.display = contenidoFiltrable.includes(input) ? "block" : "none";
-            }
-        }
+        // CIRUGÍA: Limpiamos los signos del texto del himno antes de comparar
+        let contenidoLimpio = contenidoFiltrable.replace(/[¡¿!?"'¿,.]/g, '');
+
+        h.style.display = contenidoLimpio.includes(inputLimpio) ? "block" : "none";
+    }
+}
 
         function abrirModal(h) {
             audio.pause(); audioBtn.innerText = "REPRODUCIR";
